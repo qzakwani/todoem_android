@@ -1,20 +1,33 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:todoem/core/style.dart';
+import 'package:todoem/firebase_options.dart';
 import './core/router.dart';
 
-void main() {
-  runApp(const App());
+void main() async {
+  // WidgetsFlutterBinding.ensureInitialized();
+  // final fb =
+  //     await Firebase.initializeApp(options: DefaultFirebaseOptions.android);
+
+  // final pref = await SharedPreferences.getInstance();
+  // final bool? darkMode = pref.getBool('darkMode');
+  runApp(App(isDarkMode: false,));
 }
 
 class App extends StatelessWidget {
-  const App({super.key});
+  final bool? isDarkMode;
+  const App({super.key, required this.isDarkMode});
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      initialRoute: '',
+    return MaterialApp(
+      theme: Styles.lightMode,
+      // themeMode:  isDarkMode ?? false ? ThemeMode.dark : ThemeMode.light,
+      initialRoute: 'todo',
       onGenerateRoute: appRouter,
-      home: Root(),
+      home: const Root(),
     );
   }
 }
