@@ -2,7 +2,7 @@
 
 import 'package:equatable/equatable.dart';
 
-enum RepeatTime { day, week, month }
+enum RepeatTime { daily, weekly, monthly }
 
 class Task extends Equatable {
   final String id;
