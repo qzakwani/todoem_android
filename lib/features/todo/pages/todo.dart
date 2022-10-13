@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:todoem/features/todo/models/task_model.dart';
+import 'package:todoem/features/todo/widgets/task_card.dart';
 
 class Todo extends StatelessWidget {
   const Todo({super.key});
@@ -8,30 +10,32 @@ class Todo extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
           child: ListView(
-        children: const [
-          Card(
-            child: SizedBox(
-              width: 300,
-              height: 50,
-              child: Center(child: Text('Task 1')),
-            ),
-          ),
-          Card(
-            child: SizedBox(
-              width: 300,
-              height: 50,
-              child: Center(child: Text('Task 2')),
-            ),
-          ),
-          Card(
-            child: SizedBox(
-              width: 300,
-              height: 50,
-              child: Center(child: Text('Task 3')),
-            ),
-          )
+        children:  [
+          taskCard(task1),
+          taskCard(task2),
+          taskCard(task1),
+          taskCard(task2),
         ],
       )),
     );
   }
 }
+
+var task1 = Task(
+    id: 'ubb',
+    task: 'Call her',
+    completed: false,
+    createdAt: DateTime.now(),
+    repeat: false);
+
+
+var task2 = Task(
+    id: 'seed',
+    task: 'Kill myself',
+    completed: false,
+    createdAt: DateTime.now(),
+    repeat: true,
+    repeatTime: RepeatTime.day,
+    due: DateTime(2022,10,14),
+    description: 'Do it when I can hopefully soon.'
+    );

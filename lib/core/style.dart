@@ -14,6 +14,7 @@ class Styles {
       onBackground:  Color(0xFF14213d),
       surface:  Color(0x1afca311),
       onSurface:  Color(0xFF14213d),
+      outline: Color(0xFFfca311)
       ),
       // textTheme: const TextTheme()
       useMaterial3: true

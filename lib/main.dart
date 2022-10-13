@@ -23,6 +23,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: Styles.lightMode,
       // themeMode:  isDarkMode ?? false ? ThemeMode.dark : ThemeMode.light,
       initialRoute: 'todo',
