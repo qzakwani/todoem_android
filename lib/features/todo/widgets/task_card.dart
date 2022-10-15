@@ -17,21 +17,15 @@ class TaskCard extends StatefulWidget {
 }
 
 class _TaskCardState extends State<TaskCard> {
-  List<Widget> _getChildren(Task t, ColorScheme scheme) {
-    TextStyle right =
-        TextStyle(color: scheme.onSecondary, fontWeight: FontWeight.w500);
-    TextStyle left = TextStyle(color: scheme.onSecondary);
-
+  List<Widget> _getChildren(Task t) {
     List<Widget> l = [
       Row(
         children: [
-          Text(
+          const Text(
             'Created:   ',
-            style: left,
           ),
           Text(
             t.createdAt.formatIt,
-            style: right,
           ),
         ],
       )
@@ -39,13 +33,11 @@ class _TaskCardState extends State<TaskCard> {
     if (t.due != null) {
       l.add(Row(
         children: [
-          Text(
+          const Text(
             'Due:          ',
-            style: left,
           ),
           Text(
             t.due!.formatIt,
-            style: right,
           ),
         ],
       ));
@@ -53,13 +45,11 @@ class _TaskCardState extends State<TaskCard> {
     if (t.repeat && t.repeatTime != null) {
       l.add(Row(
         children: [
-          Text(
+          const Text(
             'Repeat:     ',
-            style: left,
           ),
           Text(
-            t.repeatTime!.time,
-            style: right,
+            t.repeatTime!,
           ),
         ],
       ));
@@ -69,7 +59,6 @@ class _TaskCardState extends State<TaskCard> {
         const Divider(),
         Text(
           t.description!,
-          style: right,
         )
       ]);
     }
@@ -81,7 +70,6 @@ class _TaskCardState extends State<TaskCard> {
   Widget build(BuildContext context) {
     final Task task = widget.task;
     dueTime = task.due?.dueIn;
-    final scheme = Theme.of(context).colorScheme;
     return Card(
       child: ExpansionTile(
         onExpansionChanged: (_) {
@@ -89,7 +77,6 @@ class _TaskCardState extends State<TaskCard> {
             dueTime = task.due?.dueIn;
           });
         },
-        backgroundColor: scheme.secondary,
         expandedCrossAxisAlignment: CrossAxisAlignment.start,
         childrenPadding: const EdgeInsets.all(10),
         leading:
@@ -99,7 +86,7 @@ class _TaskCardState extends State<TaskCard> {
             ? Text(
                 'Due $dueTime',
                 style: dueTime!.contains('ago')
-                    ? TextStyle(color: scheme.error)
+                    ? TextStyle(color: Theme.of(context).colorScheme.error)
                     : null,
               )
             : null,
@@ -109,7 +96,7 @@ class _TaskCardState extends State<TaskCard> {
                   PopupMenuDivider(),
                   PopupMenuItem(value: TaskMenu.delete, child: Text('Delete')),
                 ]),
-        children: _getChildren(task, scheme),
+        children: _getChildren(task),
       ),
     );
   }
