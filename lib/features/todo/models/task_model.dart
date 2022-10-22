@@ -1,50 +1,78 @@
-// ignore_for_file: unnecessary_this
-import 'dart:convert';
+// ignore_for_file: unnecessary_this, must_be_immutable
 import 'package:equatable/equatable.dart';
+import 'package:hive/hive.dart';
 
-class Task extends Equatable {
-  final String id;
-  final String task;
-  final bool completed;
+part 'task_model.g.dart';
+
+abstract class BaseTask extends Equatable {
+  @override
+  List<Object?> get props => [];
+}
+
+@HiveType(typeId: 0)
+class Task extends HiveObject implements BaseTask {
+  @HiveField(0)
+  String task;
+
+  @HiveField(1)
+  bool completed;
+
+  @HiveField(2)
   final DateTime createdAt;
-  final DateTime? due;
-  final bool repeat;
-  final String? repeatTime;
-  final String? description;
 
-  const Task(
-      {required this.id,
-      required this.task,
+  @HiveField(3)
+  DateTime? due;
+
+  @HiveField(4)
+  bool? repeat;
+
+  @HiveField(5)
+  String? repeatTime;
+
+  @HiveField(6)
+  String? description;
+
+  Task(
+      {required this.task,
       required this.completed,
       required this.createdAt,
       this.due,
-      required this.repeat,
+      this.repeat,
       this.repeatTime,
       this.description});
 
-  factory Task.fromCache(String cachedTask) {
-    Map<String, dynamic> map = const JsonDecoder().convert(cachedTask);
+  factory Task.newTask(
+      {required String task,
+      DateTime? due,
+      bool? repeat,
+      String? repeatTime,
+      String? desc}) {
+    var createdAt = DateTime.now();
+    var completed = false;
+    var rt = repeat != null ? repeatTime : null;
     return Task(
-        id: map['id'],
-        task: map['task'],
-        completed: map['completed'],
-        createdAt: map['createdAt'],
-        repeat: map['repeat'],
-        due: map['due'],
-        repeatTime: map['repeatTime'],
-        description: map['description']);
+        task: task,
+        completed: completed,
+        createdAt: createdAt,
+        due: due,
+        repeat: repeat,
+        repeatTime: rt,
+        description: desc);
   }
 
-  Task.fromDB(Map<String, dynamic> dbTask)
-      : id = dbTask['id'],
-        task = dbTask['task'],
-        completed = dbTask['completed'],
-        createdAt = dbTask['createdAt'],
-        due = dbTask['due'],
-        repeat = dbTask['repeat'],
-        repeatTime = dbTask['repeatTime'],
-        description = dbTask['description'];
+  Future<void> changeStatus() {
+    this.completed = !this.completed;
+    return this.save();
+  }
 
   @override
-  List<Object?> get props => [id];
+  List<Object?> get props => [key];
+
+  @override
+  bool? get stringify => true;
+
+  @override
+  String toString() {
+    return '$key : $task';
+  }
 }

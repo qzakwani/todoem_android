@@ -2,21 +2,19 @@
 
 import 'package:flutter/material.dart';
 import 'package:todoem/core/style/style.dart';
-import 'package:todoem/features/todo/pages/edit_task.dart';
-
 import '../models/task_model.dart';
 import '../../../core/extensions.dart' show TimeLeft;
 import 'package:flutter_slidable/flutter_slidable.dart';
 
-class TaskCard extends StatefulWidget {
+class CompletedTaskCard extends StatefulWidget {
   final Task task;
-  const TaskCard({super.key, required this.task});
+  const CompletedTaskCard({super.key, required this.task});
 
   @override
-  State<TaskCard> createState() => _TaskCardState();
+  State<CompletedTaskCard> createState() => _CompletedTaskCardState();
 }
 
-class _TaskCardState extends State<TaskCard> {
+class _CompletedTaskCardState extends State<CompletedTaskCard> {
   List<Widget> _getChildren() {
     List<Widget> l = [
       Row(
@@ -91,7 +89,7 @@ class _TaskCardState extends State<TaskCard> {
                 },
                 backgroundColor: Styles.green,
                 foregroundColor: Colors.white,
-                label: 'Done',
+                label: 'Undone',
               )
             ]),
         endActionPane: ActionPane(
@@ -100,18 +98,6 @@ class _TaskCardState extends State<TaskCard> {
               t.delete();
             }),
             children: [
-              SlidableAction(
-                onPressed: (context) {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => EditTask(task: t)));
-                },
-                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                foregroundColor:
-                    Theme.of(context).colorScheme.onPrimaryContainer,
-                label: 'Edit',
-              ),
               SlidableAction(
                 onPressed: (context) {
                   t.delete();
@@ -139,15 +125,12 @@ class _TaskCardState extends State<TaskCard> {
                   setState(() {});
                 }
               }),
-          title: Text(t.task),
-          subtitle: t.due != null
-              ? Text(
-                  'Due $dueTime',
-                  style: dueTime!.contains('ago')
-                      ? TextStyle(color: Theme.of(context).colorScheme.error)
-                      : null,
-                )
-              : null,
+          title: Text(
+            t.task,
+            style: const TextStyle(
+              decoration: TextDecoration.lineThrough,
+            ),
+          ),
           trailing: _TaskOptions(task: t),
           children: _getChildren(),
         ),
@@ -172,13 +155,6 @@ class _TaskOptionsState extends State<_TaskOptions> {
     return PopupMenuButton(
         onSelected: (value) {
           switch (value) {
-            case TaskMenu.edit:
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => EditTask(task: widget.task)));
-              setState(() {});
-              break;
             case TaskMenu.delete:
               widget.task.delete();
               setState(() {});
@@ -187,8 +163,6 @@ class _TaskOptionsState extends State<_TaskOptions> {
           }
         },
         itemBuilder: (context) => const <PopupMenuEntry<TaskMenu>>[
-              PopupMenuItem(value: TaskMenu.edit, child: Text('Edit')),
-              PopupMenuDivider(),
               PopupMenuItem(value: TaskMenu.delete, child: Text('Delete')),
             ]);
   }

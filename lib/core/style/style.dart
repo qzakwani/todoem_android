@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../cubit/theme_cubit.dart';
 import 'ob.g.dart';
 import 'ow.g.dart';
 
@@ -11,15 +10,18 @@ class Styles {
   static Color get red => const Color.fromRGBO(202, 11, 0, 1);
   static Color get lightGray => const Color.fromRGBO(212, 212, 212, 1);
 
-  static ThemeData getTheme(TodoemTheme theme, bool isElegant) {
+  static ThemeData getTheme(String? theme, bool isElegant) {
     switch (theme) {
-      case TodoemTheme.lightOxfordBlue:
-        return ThemeData(useMaterial3: isElegant, colorScheme: lightOxfordBlue);
-      case TodoemTheme.darkOxfordBlue:
+      case 'lightOxfordBlue':
+        return ThemeData(
+          useMaterial3: isElegant,
+          colorScheme: lightOxfordBlue,
+        );
+      case 'darkOxfordBlue':
         return ThemeData(useMaterial3: isElegant, colorScheme: darkOxfordBlue);
-      case TodoemTheme.lightOrangeWeb:
+      case 'lightOrangeWeb':
         return ThemeData(useMaterial3: isElegant, colorScheme: lightOrangeWeb);
-      case TodoemTheme.darkOrangeWeb:
+      case 'darkOrangeWeb':
         return ThemeData(useMaterial3: isElegant, colorScheme: darkOrangeWeb);
       default:
         return ThemeData(useMaterial3: isElegant, colorScheme: lightOxfordBlue);

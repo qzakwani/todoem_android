@@ -2,16 +2,8 @@
 
 part of 'theme_cubit.dart';
 
-enum TodoemTheme {
-  lightOxfordBlue,
-  darkOxfordBlue,
-  lightOrangeWeb,
-  darkOrangeWeb,
-  black
-}
-
 class AppTheme extends Equatable {
-  final TodoemTheme theme;
+  final String? theme;
   final bool elegant;
 
   const AppTheme({required this.theme, this.elegant = false});
@@ -19,6 +11,3 @@ class AppTheme extends Equatable {
   List<Object?> get props => [theme, elegant];
 }
 
-extension Stringify on TodoemTheme {
-  String get string => this.toString().split('.').last;
-}

@@ -1,39 +1,29 @@
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:todoem/core/cubit/theme_cubit.dart';
-import 'package:todoem/core/style/style.dart';
-import 'package:todoem/firebase_options.dart';
-import './core/router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:todoem/features/todo/models/task_model.dart';
+
+import 'core/cubit/theme_cubit.dart';
+import 'core/router.dart';
+import 'core/style/style.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  // WidgetsFlutterBinding.ensureInitialized();
   // final fb =
   //     await Firebase.initializeApp(options: DefaultFirebaseOptions.android);
-
-  final pref = await SharedPreferences.getInstance();
-  final String? theme = pref.getString('theme');
-  final bool? elegant = pref.getBool('elegant');
-  runApp(BlocProvider(
-    create: (context) => ThemeCubit(_getThemeEnum(theme), elegant ?? false, pref),
+  await Hive.initFlutter();
+  Hive.registerAdapter(TaskAdapter());
+  var settingsBox = await Hive.openBox('settings');
+  await Hive.openBox<Task>('tasks');
+  runApp(MultiBlocProvider(
+    providers: [
+      BlocProvider(
+        create: (context) => ThemeCubit(settingsBox),
+      ),
+      // BlocProvider(create: (context) => TaskBloc(pref)..add(FetchAllTasks())),
+    ],
     child: const App(),
   ));
-}
-
-TodoemTheme _getThemeEnum(String? t) {
-  switch (t) {
-    case 'lightOxfordBlue':
-      return TodoemTheme.lightOxfordBlue;
-    case 'darkOxfordBlue':
-      return TodoemTheme.darkOxfordBlue;
-    case 'lightOrangeWeb':
-      return TodoemTheme.lightOrangeWeb;
-    case 'darkOrangeWeb':
-      return TodoemTheme.darkOrangeWeb;
-    default:
-      return TodoemTheme.lightOxfordBlue;
-  }
 }
 
 class App extends StatelessWidget {

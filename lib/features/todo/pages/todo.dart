@@ -1,21 +1,21 @@
+// ignore_for_file: unused_element
+
 import 'package:flutter/material.dart';
-import '../../../core/cubit/theme_cubit.dart';
-import '../models/task_model.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:todoem/features/todo/widgets/settings.dart';
+import '../../../core/layout.dart';
 import '../widgets/task_card.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import '../models/task_model.dart';
 
 class Todo extends StatelessWidget {
-  Todo({super.key});
-
-  final tasks = [task1, task2, task1, task2];
+  const Todo({super.key});
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        endDrawer: const _Drawer(),
+        endDrawer: const SettingsDrawer(),
         appBar: AppBar(
-          leading: const Icon(Icons.person),
           title: const Text('Tasks'),
           actions: [
             Builder(builder: (context) {
@@ -27,126 +27,69 @@ class Todo extends StatelessWidget {
             })
           ],
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: ListView.builder(
-            itemCount: tasks.length,
-            itemBuilder: (BuildContext context, int index) {
-              return TaskCard(task: tasks[index]);
-            },
+        body: const Padding(padding: EdgeInsets.all(8.0), child: _TaskList()),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButton: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              FloatingActionButton(
+                heroTag: 1,
+                backgroundColor: Theme.of(context).colorScheme.tertiary,
+                foregroundColor: Theme.of(context).colorScheme.onTertiary,
+                onPressed: (() {
+                  Navigator.of(context).pushNamed('todo/completed_tasks');
+                }),
+                enableFeedback: true,
+                child: const Icon(Icons.done),
+              ),
+              FloatingActionButton(
+                heroTag: 0,
+                onPressed: (() {
+                  Navigator.of(context).pushNamed('todo/add_task');
+                }),
+                enableFeedback: true,
+                child: const Icon(Icons.add),
+              ),
+            ],
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: (() {
-            Navigator.of(context).pushNamed('todo/add_task');
-          }),
-          enableFeedback: true,
-          child: const Icon(Icons.add),
-        ),
       ),
     );
   }
 }
 
-class _Drawer extends StatefulWidget {
-  const _Drawer();
+class _TaskList extends StatefulWidget {
+  const _TaskList({super.key});
 
   @override
-  State<_Drawer> createState() => __DrawerState();
+  State<_TaskList> createState() => __TaskListState();
 }
 
-class __DrawerState extends State<_Drawer> {
-  late TodoemTheme theme;
-  late bool isElegant;
-
+class __TaskListState extends State<_TaskList> {
   @override
   Widget build(BuildContext context) {
-    theme = context.read<ThemeCubit>().state.theme;
-    isElegant = context.read<ThemeCubit>().state.elegant;
-    return Drawer(
-      child: Column(
-        children: [
-          const DrawerHeader(margin: null, child: Text('Settings')),
-          const Text('Theme'),
-          CheckboxListTile(
-              title: const Text('Elegant'),
-              value: isElegant,
-              onChanged: ((value) {
-                if (value != null) {
-                  setState(() {
-                    isElegant = value;
-                    context.read<ThemeCubit>().changeTheme(theme, isElegant);
-                  });
-                }
-              })),
-          const Divider(),
-          RadioListTile(
-              title: const Text('Oxford Blue'),
-              value: TodoemTheme.lightOxfordBlue,
-              groupValue: theme,
-              onChanged: (value) {
-                setState(() {
-                  if (value != null) {
-                    theme = value;
-                    context.read<ThemeCubit>().changeTheme(theme, isElegant);
-                  }
-                });
-              }),
-          RadioListTile(
-              title: const Text('Oxford Blue Dark'),
-              value: TodoemTheme.darkOxfordBlue,
-              groupValue: theme,
-              onChanged: (value) {
-                setState(() {
-                  if (value != null) {
-                    theme = value;
-                    context.read<ThemeCubit>().changeTheme(theme, isElegant);
-                  }
-                });
-              }),
-          RadioListTile(
-              title: const Text('Orange Web'),
-              value: TodoemTheme.lightOrangeWeb,
-              groupValue: theme,
-              onChanged: (value) {
-                setState(() {
-                  if (value != null) {
-                    theme = value;
-                    context.read<ThemeCubit>().changeTheme(theme, isElegant);
-                  }
-                });
-              }),
-          RadioListTile(
-              title: const Text('Orange Web Dark'),
-              value: TodoemTheme.darkOrangeWeb,
-              groupValue: theme,
-              onChanged: (value) {
-                setState(() {
-                  if (value != null) {
-                    theme = value;
-                    context.read<ThemeCubit>().changeTheme(theme, isElegant);
-                  }
-                });
-              }),
-        ],
-      ),
-    );
+    return ValueListenableBuilder(
+        valueListenable: Hive.box<Task>('tasks').listenable(),
+        builder: (context, box, child) {
+          final tasks = box.values.where((element) => !element.completed);
+          return tasks.isNotEmpty
+              ? ListView.builder(
+                  itemCount: tasks.length,
+                  itemBuilder: (context, index) => TaskCard(
+                      key: ValueKey(tasks.elementAt(index).key),
+                      task: tasks.elementAt(index)))
+              : Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('No Tasks Yet'),
+                      Layout.gap(10.0),
+                      const Icon(Icons.note_alt_rounded)
+                    ],
+                  ),
+                );
+        });
   }
 }
-
-var task1 = Task(
-    id: 'ubb',
-    task: 'Call her',
-    completed: false,
-    createdAt: DateTime.now(),
-    repeat: false);
-
-var task2 = Task(
-    id: 'seed',
-    task: 'Kill myself',
-    completed: false,
-    createdAt: DateTime.now(),
-    repeat: true,
-    repeatTime: 'weekly',
-    due: DateTime(2022, 10, 14),
-    description: 'Do it when I can hopefully soon.');

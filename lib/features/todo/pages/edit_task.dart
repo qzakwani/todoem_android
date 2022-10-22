@@ -1,52 +1,52 @@
-// ignore_for_file: unused_element, depend_on_referenced_packages
+// ignore_for_file: depend_on_referenced_packages
 
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import '../../../core/extensions.dart' show TimeLeft;
-import 'package:todoem/core/layout.dart';
+import 'package:todoem/core/extensions.dart';
 import 'package:todoem/features/todo/models/task_model.dart';
+import 'package:todoem/core/layout.dart';
 
-class AddTask extends StatelessWidget {
-  const AddTask({super.key});
+class EditTask extends StatefulWidget {
+  const EditTask({super.key, required this.task});
 
-  @override
-  Widget build(BuildContext context) {
-    return const _TaskForm();
-  }
-}
-
-class _TaskForm extends StatefulWidget {
-  const _TaskForm({super.key});
+  final Task task;
 
   @override
-  State<_TaskForm> createState() => _TaskFormState();
+  State<EditTask> createState() => _EditTaskState();
 }
 
-class _TaskFormState extends State<_TaskForm> {
+class _EditTaskState extends State<EditTask> {
   final _formKey = GlobalKey<FormState>();
-  DateTime? due;
+  late Task task;
   TextDirection? txtDir;
   TextDirection? txtDirDes;
-  bool isRepeat = false;
-  String repeatTime = 'daily';
   final taskController = TextEditingController();
   final descController = TextEditingController();
+  late String rt;
+
+  @override
+  void initState() {
+    task = widget.task;
+
+    taskController.text = task.task;
+    if (task.description != null) {
+      descController.text = task.description!;
+    }
+    rt = task.repeatTime ?? 'daily';
+    super.initState();
+  }
 
   TextDirection _changeDir(String value) =>
       RegExp(r'[\u0600-\u06FF]', unicode: true).hasMatch(value)
           ? TextDirection.rtl
           : TextDirection.ltr;
 
-  Task _createTask() => Task.newTask(
-      task: taskController.text,
-      repeat: isRepeat,
-      repeatTime: isRepeat ? repeatTime : null,
-      due: due,
-      desc: descController.text.isEmpty ? null : descController.text);
-
   void submitForm() {
     if (_formKey.currentState!.validate()) {
-      Hive.box<Task>('tasks').add(_createTask());
+      task.task = taskController.text;
+      task.description =
+          descController.text.isNotEmpty ? descController.text : null;
+      task.repeat == true ? task.repeatTime = rt : task.repeatTime = null;
+      task.save();
       Navigator.pop(context);
     }
   }
@@ -61,16 +61,18 @@ class _TaskFormState extends State<_TaskForm> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('New Task'),
+          title: const Text('Edit Task'),
           actions: [
             TextButton(
                 onPressed: submitForm,
                 child: Text(
                   'Done',
-                  style: scheme.brightness == Brightness.light
+                  style: scheme.brightness == Brightness.light &&
+                          Theme.of(context).useMaterial3 == false
                       ? TextStyle(color: scheme.onPrimary)
                       : null,
                 ))
@@ -93,8 +95,7 @@ class _TaskFormState extends State<_TaskForm> {
                       }
                     },
                     textDirection: txtDir,
-                    decoration: const InputDecoration(hintText: 'New Task'),
-                    autofocus: true,
+                    decoration: const InputDecoration(hintText: 'Edit Task'),
                     maxLines: null,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -108,10 +109,10 @@ class _TaskFormState extends State<_TaskForm> {
                     children: [
                       const Text('Due: '),
                       Visibility(
-                          visible: due != null,
+                          visible: task.due != null,
                           child: Row(
                             children: [
-                              Text(due != null ? due!.formatIt : ''),
+                              Text(task.due != null ? task.due!.formatIt : ''),
                               ElevatedButton(
                                   style: ElevatedButton.styleFrom(
                                       shape: const CircleBorder(),
@@ -119,7 +120,7 @@ class _TaskFormState extends State<_TaskForm> {
                                           Theme.of(context).colorScheme.error),
                                   onPressed: () {
                                     setState(() {
-                                      due = null;
+                                      task.due = null;
                                     });
                                   },
                                   child: Icon(
@@ -144,7 +145,7 @@ class _TaskFormState extends State<_TaskForm> {
                                   initialTime: TimeOfDay.now());
                               if (time != null) {
                                 setState(() {
-                                  due = DateTime(date.year, date.month,
+                                  task.due = DateTime(date.year, date.month,
                                       date.day, time.hour, time.minute);
                                 });
                               }
@@ -158,19 +159,19 @@ class _TaskFormState extends State<_TaskForm> {
                     children: [
                       const Text('Repeat: '),
                       Checkbox(
-                          value: isRepeat,
+                          value: task.repeat,
                           onChanged: (v) {
                             if (v != null) {
                               setState(() {
-                                isRepeat = v;
+                                task.repeat = v;
                               });
                             }
                           }),
                       Visibility(
-                          visible: isRepeat,
+                          visible: task.repeat ?? false,
                           child: Expanded(
                             child: DropdownButtonFormField(
-                              value: repeatTime,
+                              value: rt,
                               items: const [
                                 DropdownMenuItem<String>(
                                   value: 'daily',
@@ -192,7 +193,7 @@ class _TaskFormState extends State<_TaskForm> {
                               onChanged: ((value) {
                                 if (value != null) {
                                   setState(() {
-                                    repeatTime = value;
+                                    rt = value;
                                   });
                                 }
                               }),
@@ -235,7 +236,7 @@ class _TaskFormState extends State<_TaskForm> {
                         Expanded(
                           child: ElevatedButton(
                             onPressed: submitForm,
-                            child: const Text('Add Task'),
+                            child: const Text('Save Task'),
                           ),
                         ),
                       ],
