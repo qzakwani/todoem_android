@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:todoem/core/style/style.dart';
 import 'package:todoem/features/todo/pages/edit_task.dart';
+import 'package:workmanager/workmanager.dart';
 
 import '../models/task_model.dart';
 import '../../../core/extensions.dart' show TimeLeft;
@@ -97,6 +98,11 @@ class _TaskCardState extends State<TaskCard> {
         endActionPane: ActionPane(
             motion: const DrawerMotion(),
             dismissible: DismissiblePane(onDismissed: () {
+              if (t.repeat == true) {
+                try {
+                  Workmanager().cancelByUniqueName(t.key.toString());
+                } catch (e) {}
+              }
               t.delete();
             }),
             children: [
@@ -114,6 +120,11 @@ class _TaskCardState extends State<TaskCard> {
               ),
               SlidableAction(
                 onPressed: (context) {
+                  if (t.repeat == true) {
+                    try {
+                      Workmanager().cancelByUniqueName(t.key.toString());
+                    } catch (e) {}
+                  }
                   t.delete();
                 },
                 backgroundColor: Theme.of(context).colorScheme.errorContainer,
@@ -180,6 +191,11 @@ class _TaskOptionsState extends State<_TaskOptions> {
               setState(() {});
               break;
             case TaskMenu.delete:
+              if (widget.task.repeat == true) {
+                try {
+                  Workmanager().cancelByUniqueName(widget.task.key.toString());
+                } catch (e) {}
+              }
               widget.task.delete();
               setState(() {});
               break;

@@ -4,7 +4,9 @@
     "audioplayers",
     "autofocus",
     "autovalidate",
+    "Cupertino",
     "datetime",
-    "RGBO"
+    "RGBO",
+    "Workmanager"
   ]
 }

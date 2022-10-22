@@ -75,11 +75,14 @@ class __TaskListState extends State<_TaskList> {
         builder: (context, box, child) {
           final tasks = box.values.where((element) => !element.completed);
           return tasks.isNotEmpty
-              ? ListView.builder(
-                  itemCount: tasks.length,
-                  itemBuilder: (context, index) => TaskCard(
-                      key: ValueKey(tasks.elementAt(index).key),
-                      task: tasks.elementAt(index)))
+              ? Padding(
+                  padding: const EdgeInsets.only(bottom: 80.0),
+                  child: ListView.builder(
+                      itemCount: tasks.length,
+                      itemBuilder: (context, index) => TaskCard(
+                          key: ValueKey(tasks.elementAt(index).key),
+                          task: tasks.elementAt(index))),
+                )
               : Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
