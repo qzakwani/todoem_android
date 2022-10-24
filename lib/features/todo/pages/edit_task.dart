@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:todoem/core/extensions.dart';
 import 'package:todoem/features/todo/models/task_model.dart';
 import 'package:todoem/core/layout.dart';
-import 'package:workmanager/workmanager.dart';
 
 class EditTask extends StatefulWidget {
   const EditTask({super.key, required this.task});
@@ -23,7 +22,6 @@ class _EditTaskState extends State<EditTask> {
   final taskController = TextEditingController();
   final descController = TextEditingController();
   late String rt;
-  bool? isRepeat;
 
   @override
   void initState() {
@@ -34,7 +32,6 @@ class _EditTaskState extends State<EditTask> {
       descController.text = task.description!;
     }
     rt = task.repeatTime ?? 'daily';
-    isRepeat = task.repeat;
     super.initState();
   }
 
@@ -50,38 +47,6 @@ class _EditTaskState extends State<EditTask> {
           descController.text.isNotEmpty ? descController.text : null;
       task.repeat == true ? task.repeatTime = rt : task.repeatTime = null;
       task.save();
-      if (isRepeat != task.repeat) {
-        if (task.repeat!) {
-          Duration? d;
-          switch (task.repeatTime) {
-            case 'daily':
-              d = const Duration(days: 1);
-              break;
-            case 'weekly':
-              d = const Duration(days: 7);
-              break;
-            case 'monthly':
-              d = const Duration(days: 30);
-              break;
-            default:
-              return;
-          }
-          Workmanager().registerPeriodicTask(
-              task.key.toString(), task.key.toString(),
-              frequency: d,
-              initialDelay: d,
-              existingWorkPolicy: ExistingWorkPolicy.keep,
-              inputData: {
-                'task': task.task,
-                'period': task.repeatTime,
-                'desc': task.description
-              });
-        } else {
-          try {
-            Workmanager().cancelByUniqueName(task.key.toString());
-          } catch (e) {}
-        }
-      }
       Navigator.pop(context);
     }
   }

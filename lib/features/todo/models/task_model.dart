@@ -18,7 +18,7 @@ class Task extends HiveObject implements BaseTask {
   bool completed;
 
   @HiveField(2)
-  final DateTime createdAt;
+  DateTime createdAt;
 
   @HiveField(3)
   DateTime? due;
@@ -32,14 +32,15 @@ class Task extends HiveObject implements BaseTask {
   @HiveField(6)
   String? description;
 
-  Task(
-      {required this.task,
-      required this.completed,
-      required this.createdAt,
-      this.due,
-      this.repeat,
-      this.repeatTime,
-      this.description});
+  Task({
+    required this.task,
+    required this.completed,
+    required this.createdAt,
+    this.due,
+    this.repeat,
+    this.repeatTime,
+    this.description,
+  });
 
   factory Task.newTask(
       {required String task,

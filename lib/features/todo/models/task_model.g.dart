@@ -1,8 +1,10 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'task_model.dart';
+
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
-
-part of 'task_model.dart';
 
 class TaskAdapter extends TypeAdapter<Task> {
   @override

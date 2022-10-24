@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:workmanager/workmanager.dart';
 import '../../../core/extensions.dart' show TimeLeft;
 import 'package:todoem/core/layout.dart';
 import 'package:todoem/features/todo/models/task_model.dart';
@@ -48,33 +47,7 @@ class _TaskFormState extends State<_TaskForm> {
   void submitForm() {
     if (_formKey.currentState!.validate()) {
       var t = _createTask();
-      Hive.box<Task>('tasks').add(t).then((value) {
-        if (t.repeat != null && t.repeat!) {
-          Duration? d;
-          switch (t.repeatTime) {
-            case 'daily':
-              d = const Duration(days: 1);
-              break;
-            case 'weekly':
-              d = const Duration(days: 7);
-              break;
-            case 'monthly':
-              d = const Duration(days: 30);
-              break;
-            default:
-              return;
-          }
-          Workmanager().registerPeriodicTask(t.key.toString(), t.key.toString(),
-              frequency: d,
-              initialDelay: d,
-              existingWorkPolicy: ExistingWorkPolicy.keep,
-              inputData: {
-                'task': t.task,
-                'period': t.repeatTime,
-                'desc': t.description
-              });
-        }
-      });
+      Hive.box<Task>('tasks').add(t);
       Navigator.pop(context);
     }
   }

@@ -1,9 +1,9 @@
 // ignore_for_file: depend_on_referenced_packages, unused_element
 
 import 'package:flutter/material.dart';
+import 'package:todoem/core/layout.dart';
 import 'package:todoem/core/style/style.dart';
 import 'package:todoem/features/todo/pages/edit_task.dart';
-import 'package:workmanager/workmanager.dart';
 
 import '../models/task_model.dart';
 import '../../../core/extensions.dart' show TimeLeft;
@@ -98,11 +98,6 @@ class _TaskCardState extends State<TaskCard> {
         endActionPane: ActionPane(
             motion: const DrawerMotion(),
             dismissible: DismissiblePane(onDismissed: () {
-              if (t.repeat == true) {
-                try {
-                  Workmanager().cancelByUniqueName(t.key.toString());
-                } catch (e) {}
-              }
               t.delete();
             }),
             children: [
@@ -120,11 +115,6 @@ class _TaskCardState extends State<TaskCard> {
               ),
               SlidableAction(
                 onPressed: (context) {
-                  if (t.repeat == true) {
-                    try {
-                      Workmanager().cancelByUniqueName(t.key.toString());
-                    } catch (e) {}
-                  }
                   t.delete();
                 },
                 backgroundColor: Theme.of(context).colorScheme.errorContainer,
@@ -152,11 +142,23 @@ class _TaskCardState extends State<TaskCard> {
               }),
           title: Text(t.task),
           subtitle: t.due != null
-              ? Text(
-                  'Due $dueTime',
-                  style: dueTime!.contains('ago')
-                      ? TextStyle(color: Theme.of(context).colorScheme.error)
-                      : null,
+              ? Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.error_outline,
+                      size: 16.0,
+                    ),
+                    Layout.gap(5.0),
+                    Text(
+                      'Due $dueTime',
+                      style: dueTime!.contains('ago')
+                          ? TextStyle(
+                              color: Theme.of(context).colorScheme.error,
+                              fontStyle: FontStyle.italic)
+                          : const TextStyle(fontStyle: FontStyle.italic),
+                    ),
+                  ],
                 )
               : null,
           trailing: _TaskOptions(task: t),
@@ -191,11 +193,6 @@ class _TaskOptionsState extends State<_TaskOptions> {
               setState(() {});
               break;
             case TaskMenu.delete:
-              if (widget.task.repeat == true) {
-                try {
-                  Workmanager().cancelByUniqueName(widget.task.key.toString());
-                } catch (e) {}
-              }
               widget.task.delete();
               setState(() {});
               break;
